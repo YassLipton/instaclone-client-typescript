@@ -2,6 +2,10 @@
 
 Here is the web client of the Instagram clone.
 
+You can use the following link to test the web application:
+
+[https://instaclone.yassbk.com/](https://instaclone.yassbk.com/)
+
 ## Stack
 
 - React
