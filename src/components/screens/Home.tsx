@@ -9,6 +9,14 @@ import moment from 'moment'
 import { Post, User } from "../models"
 import { API_URI } from "../../App"
 
+const Is_User_Followed = (postUser: User, loggedUser: User) => {
+  if (postUser?.followers.find(follower => follower == loggedUser._id) !== undefined) {
+    return true
+  } else {
+    return false
+  }
+}
+
 const Home = (props: {userInfos: User}) => {
   const [, forceUpdate] = useReducer(x => x + 1, 0)
   const [sideContainerLeftPosition, setSideContainerLeftPositionState] = useState<number>(0)
@@ -17,6 +25,7 @@ const Home = (props: {userInfos: User}) => {
   const [isModalSubscribeOpen, setModalSubscribeOpen] = useState<boolean>(false)
   const [selectedPostIndex, setSelectedPostIndex] = useState<number>()
   const [commentText, setCommentText] = useState<string>('')
+  const [usersSuggested, setUsersUggested] = useState<User[]>([])
 
   const { userInfos } = props
 
@@ -25,6 +34,8 @@ const Home = (props: {userInfos: User}) => {
       const request = await fetch(`${API_URI}/post`)
       const responseJson = await request.json()
       setDisplayedPosts(responseJson)
+      const usersToSuggest: any[] = [...new Map(responseJson.map((post: Post, postIndex: number) => [post.user._id, post.user])).values()]
+      setUsersUggested(usersToSuggest)
     }
     Posts_Listing()
   }, [])
@@ -251,46 +262,24 @@ const Home = (props: {userInfos: User}) => {
               <a id='show_all'>Voir tout</a>
             </div>
             <div className='suggestions-boxes'>
-              <div className='suggestions-box'>
-                <div>
-                  <img src={therock} />
-                  <div className='suggestions-box-text'>
-                    <a id='title'>therock</a>
-                    <span id='subtitle'>Populaire</span>
-                  </div>
-                </div>
-                <a className='suggestions-box-sub'>S'abonner</a>
-              </div>
-              <div className='suggestions-box'>
-                <div>
-                  <img src={therock} />
-                  <div className='suggestions-box-text'>
-                    <a id='title'>therock</a>
-                    <span id='subtitle'>Populaire</span>
-                  </div>
-                </div>
-                <a className='suggestions-box-sub'>S'abonner</a>
-              </div>
-              <div className='suggestions-box'>
-                <div>
-                  <img src={therock} />
-                  <div className='suggestions-box-text'>
-                    <a id='title'>therock</a>
-                    <span id='subtitle'>Populaire</span>
-                  </div>
-                </div>
-                <a className='suggestions-box-sub'>S'abonner</a>
-              </div>
-              <div className='suggestions-box'>
-                <div>
-                  <img src={therock} />
-                  <div className='suggestions-box-text'>
-                    <a id='title'>therock</a>
-                    <span id='subtitle'>Populaire</span>
-                  </div>
-                </div>
-                <a className='suggestions-box-sub'>S'abonner</a>
-              </div>
+            {
+              usersSuggested.map((user: User, userIndex: number) => {
+                if (user.username != userInfos.username && userIndex <= 5 && !Is_User_Followed(user, userInfos)) {
+                  return (
+                    <div className='suggestions-box'>
+                      <div>
+                        <img src={user.profilePicUrl} />
+                        <div className='suggestions-box-text'>
+                          <a id='title' href={`#/profile/${user._id}`}>{user.username}</a>
+                          <span id='subtitle'>{user.fullName}</span>
+                        </div>
+                      </div>
+                      <a className='suggestions-box-sub'>S'abonner</a>
+                    </div>
+                  )
+                }
+              })
+            }
             </div>
           </div>
         </div>
