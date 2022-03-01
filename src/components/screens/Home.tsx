@@ -34,7 +34,7 @@ const Home = (props: {userInfos: User}) => {
       const request = await fetch(`${API_URI}/post`)
       const responseJson = await request.json()
       setDisplayedPosts(responseJson)
-      const usersToSuggest: any[] = [...new Map(responseJson.map((post: Post, postIndex: number) => [post.user._id, post.user])).values()]
+      const usersToSuggest: any[] = [...new Map(responseJson.map((post: Post, postIndex: number) => [post.user.username, post.user])).values()]
       setUsersUggested(usersToSuggest)
     }
     Posts_Listing()
