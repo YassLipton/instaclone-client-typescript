@@ -295,8 +295,8 @@ const Profile = (props: {userInfos: User}) => {
             </div>
             <div className='profile-header-box-bio-col'>
               <span className='bio-username'>{userDetails?.fullName}</span>
-              <span className='bio-text'>The home of Manchester United. Shop our latest deals on United Direct ⬇️</span>
-              <a className='bio-link'>bit.ly/3AnSG8m</a>
+              <span className='bio-text'>{userDetails.bio}</span>
+              <a className='bio-link'>{userDetails.link}</a>
             </div>
             <span className='profile-header-box-followers'><span id='username'>yassmald</span> est abonné(e)</span>
           </div>
