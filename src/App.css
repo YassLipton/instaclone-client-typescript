@@ -1341,6 +1341,104 @@ textarea::placeholder {
   font-weight: 600;
 }
 
+/* EditProfile */
+.edit-profile-container {
+  height: calc(100vh - var(--nav-height) - 50px);
+  background-color: #fff;
+  border: 1px solid #dbdbdb;
+  border-radius: 4px;
+  margin-top: calc(var(--nav-height) + 25px);
+}
+.edit-profile-sidebar {
+  width: 236px;
+  height: 100%;
+  border-right: 1px solid #dbdbdb;
+}
+.edit-profile-form-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 32px 0px;
+}
+.edit-profile-form-row {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 18px;
+}
+.edit-profile-form-label {
+  display: flex;
+  justify-content: flex-end;
+  width: 130px;
+  padding: 0px 32px;
+}
+.edit-profile-form-label label {
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 4px;
+  text-align: right;
+}
+.edit-profile-form-label img {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+}
+.edit-profile-form-username {
+  display: flex;
+  flex-direction: column;
+}
+.edit-profile-form-input {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 355px;
+}
+.edit-profile-form-input input {
+  width: 100%;
+  height: 32px;
+  padding: 0 10px;
+  font-size: 16px;
+  font-weight: 100;
+  border: 1px solid #dbdbdb;
+  border-radius: 3px;
+}
+.edit-profile-form-input::placeholder {
+  color: #9e9e9e;
+  font-weight: lighter;
+}
+.edit-profile-form-username {
+  font-size: 20px;
+  line-height: 22px;
+  margin-bottom: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.edit-profile-form-upload-btn {
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  color: #0095f6;
+  background: none;
+  border: none;
+  padding: 0px;
+}
+.edit-profile-form-submit-btn:hover, .edit-profile-form-upload-btn:hover {
+  cursor: pointer;
+}
+.edit-profile-form-submit-btn {
+  width: fit-content;
+  border: 1px solid #dbdbdb;
+  border-radius: 4px;
+  font-family: RobotoLight;
+  font-size: 13px;
+  font-weight: 600;
+  margin-right: 8px;
+  padding: 6px 12px;
+  background-color: #0095f6;
+  color: #fff;
+  height: 30px;
+}
+
 @media screen and (min-width: 992px) {
   .post-box-img {
     max-height: 100%;

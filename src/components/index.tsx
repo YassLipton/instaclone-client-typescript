@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Switch, Route, HashRouter } from "react-router
 import { API_URI } from "../App";
 import AppContainer from "./AppContainer";
 import { User } from "./models";
+import EditProfile from "./screens/EditProfile";
 
 import Home from "./screens/Home";
 import Profile from "./screens/Profile";
@@ -55,6 +56,7 @@ const Components = () => {
         currentRoutes = [
           { url: "", component: <Home userInfos={userInfos} /> },
           { url: "profile/:id", component: <Profile userInfos={userInfos} /> },
+          { url: "edit", component: <EditProfile userInfos={userInfos} /> },
           { url: "signin", component: <SignIn /> },
           { url: "signup", component: <SignUp /> }
         ]

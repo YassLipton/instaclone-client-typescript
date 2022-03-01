@@ -9,6 +9,14 @@ import moment from 'moment'
 import { Post, User } from "../models"
 import { API_URI } from "../../App"
 
+const Is_User_Followed = (postUser: User, loggedUser: User): boolean => {
+  if (postUser?.followers.find(follower => follower == loggedUser._id) !== undefined) {
+    return true
+  } else {
+    return false
+  }
+}
+
 const Home = (props: {userInfos: User}) => {
   const [, forceUpdate] = useReducer(x => x + 1, 0)
   const [sideContainerLeftPosition, setSideContainerLeftPositionState] = useState<number>(0)
@@ -17,6 +25,7 @@ const Home = (props: {userInfos: User}) => {
   const [isModalSubscribeOpen, setModalSubscribeOpen] = useState<boolean>(false)
   const [selectedPostIndex, setSelectedPostIndex] = useState<number>()
   const [commentText, setCommentText] = useState<string>('')
+  const [usersSuggested, setUsersUggested] = useState<User[]>([])
 
   const { userInfos } = props
 
@@ -25,6 +34,8 @@ const Home = (props: {userInfos: User}) => {
       const request = await fetch(`${API_URI}/post`)
       const responseJson = await request.json()
       setDisplayedPosts(responseJson)
+      const usersToSuggest: any[] = [...new Map(responseJson.map((post: Post, postIndex: number) => [post.user._id, post.user])).values()]
+      setUsersUggested(usersToSuggest)
     }
     Posts_Listing()
   }, [])
@@ -112,7 +123,7 @@ const Home = (props: {userInfos: User}) => {
     }
   }
 
-  const Add_A_Comment = async (postId: string): Promise<void> => {
+  const Add_A_Comment = async (postId: string, postIndex: number): Promise<void> => {
     const request = await fetch(`${API_URI}/post/comment/add`, {
       method: "POST",
       body: JSON.stringify({
@@ -125,6 +136,7 @@ const Home = (props: {userInfos: User}) => {
       }
     })
     const response = await request
+    if (response.status == 200) {}
   }
 
   const Open_Subscribe_Modal = () => {
@@ -230,7 +242,7 @@ const Home = (props: {userInfos: User}) => {
                   <div className="post-box-infos-input">
                     <svg id='smiley' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 295.996 295.996"><g><path d="M147.998,0C66.392,0,0,66.392,0,147.998s66.392,147.998,147.998,147.998s147.998-66.392,147.998-147.998S229.605,0,147.998,0z M147.998,279.996c-36.256,0-69.143-14.696-93.022-38.44c-9.536-9.482-17.631-20.41-23.934-32.42C21.442,190.847,16,170.047,16,147.998C16,75.214,75.214,16,147.998,16c34.523,0,65.987,13.328,89.533,35.102c12.208,11.288,22.289,24.844,29.558,39.996c8.27,17.239,12.907,36.538,12.907,56.9C279.996,220.782,220.782,279.996,147.998,279.996z" /><circle cx="99.666" cy="114.998" r="16" /><circle cx="198.666" cy="114.998" r="16" /><path d="M147.715,229.995c30.954,0,60.619-15.83,77.604-42.113l-13.439-8.684c-15.597,24.135-44.126,37.604-72.693,34.308c-22.262-2.567-42.849-15.393-55.072-34.308l-13.438,8.684c14.79,22.889,39.716,38.409,66.676,41.519C140.814,229.8,144.27,229.995,147.715,229.995z" /></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g></svg>
                     <textarea onChange={e => setCommentText(e.target.value)} placeholder='Ajouter un commentaire...'></textarea>
-                    <button disabled={commentText.length == 0} onClick={() => Add_A_Comment(post._id)}>Publier</button>
+                    <button disabled={commentText.length == 0} onClick={() => Add_A_Comment(post._id, postIndex)}>Publier</button>
                   </div>
                 </div>
               )
@@ -246,52 +258,24 @@ const Home = (props: {userInfos: User}) => {
             </div>
           </div>
           <div className='suggestions-container'>
-            <div className='suggestions-header'>
-              <span id='text'>Suggestions pour vous</span>
-              <a id='show_all'>Voir tout</a>
-            </div>
-            <div className='suggestions-boxes'>
-              <div className='suggestions-box'>
-                <div>
-                  <img src={therock} />
-                  <div className='suggestions-box-text'>
-                    <a id='title'>therock</a>
-                    <span id='subtitle'>Populaire</span>
+          {
+            usersSuggested.map((user: User, userIndex: number) => {
+              if (user.username != userInfos.username && userIndex <= 5 && !Is_User_Followed(user, userInfos)) {
+                return (
+                  <div className='suggestions-box'>
+                    <div>
+                      <img src={user.profilePicUrl} />
+                      <div className='suggestions-box-text'>
+                        <a id='title' href={`#/profile/${user._id}`}>{user.username}</a>
+                        <span id='subtitle'>{user.fullName}</span>
+                      </div>
+                    </div>
+                    <a className='suggestions-box-sub'>S'abonner</a>
                   </div>
-                </div>
-                <a className='suggestions-box-sub'>S'abonner</a>
-              </div>
-              <div className='suggestions-box'>
-                <div>
-                  <img src={therock} />
-                  <div className='suggestions-box-text'>
-                    <a id='title'>therock</a>
-                    <span id='subtitle'>Populaire</span>
-                  </div>
-                </div>
-                <a className='suggestions-box-sub'>S'abonner</a>
-              </div>
-              <div className='suggestions-box'>
-                <div>
-                  <img src={therock} />
-                  <div className='suggestions-box-text'>
-                    <a id='title'>therock</a>
-                    <span id='subtitle'>Populaire</span>
-                  </div>
-                </div>
-                <a className='suggestions-box-sub'>S'abonner</a>
-              </div>
-              <div className='suggestions-box'>
-                <div>
-                  <img src={therock} />
-                  <div className='suggestions-box-text'>
-                    <a id='title'>therock</a>
-                    <span id='subtitle'>Populaire</span>
-                  </div>
-                </div>
-                <a className='suggestions-box-sub'>S'abonner</a>
-              </div>
-            </div>
+                )
+              }
+            })
+          }
           </div>
         </div>
         {isPostOpen && <PostContainer
