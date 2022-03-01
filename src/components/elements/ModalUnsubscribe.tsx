@@ -5,6 +5,7 @@ export const ModalUnsubscribe = (props: {
   isOpen: boolean,
   CloseModal: () => void,
   updatePost: (postInfos: Post) => void,
+  UnfollowUser?: () => void,
   postInfos: Post,
   userInfos: User
 }) => {
@@ -45,7 +46,7 @@ export const ModalUnsubscribe = (props: {
           </div>
         </div>
         <div className='modal-buttons'>
-          <button className='btn-text-red btn-text-bold' onClick={UnFollow_User}>Se désabonner</button>
+          <button className='btn-text-red btn-text-bold' onClick={props.UnfollowUser ? props.UnfollowUser : UnFollow_User}>Se désabonner</button>
           <button onClick={CloseModal}>Annuler</button>
         </div>
       </div>

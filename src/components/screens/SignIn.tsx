@@ -33,7 +33,7 @@ const SignIn = () => {
   }
 
   const Redirect_To_Register_Page = () => {
-    window.location.pathname = 'signup'
+    window.location.hash = 'signup'
   }
 
   return (

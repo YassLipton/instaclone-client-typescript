@@ -6,7 +6,7 @@ import { PostContainer } from '../elements/PostContainer'
 import { ModalUnsubscribe } from '../elements/ModalUnsubscribe'
 import { API_URI } from '../../App'
 
-const Is_User_Followed = (postUser: User, loggedUser: User) => {
+const Is_User_Followed = (postUser: User, loggedUser: User): boolean => {
   if (postUser?.followers.find(follower => follower == loggedUser._id) !== undefined) {
     return true
   } else {
@@ -28,35 +28,39 @@ const Profile = (props: {userInfos: User}) => {
   const [selectedPostIndex, setSelectedPostIndex] = useState<number>()
 
   const { userInfos } = props
-  
+
   const { id } = useParams<ParamTypes>()
 
   useEffect(() => {
-    const User_Details = async () => {
+    const User_Details = async (id: string): Promise<void> => {
       const request = await fetch(`${API_URI}/user/${id}`)
       const responseJson = await request.json()
-      console.log(responseJson);
       setUserDetails(responseJson)
     }
-    const Posts_Listing = async () => {
+    const Posts_Listing = async (id: string): Promise<void> => {
       const request = await fetch(`${API_URI}/post/listByUser/${id}`)
       const responseJson = await request.json()
-      console.log(responseJson);
       setAllUserPosts(responseJson)
     }
-    User_Details()
-    Posts_Listing()
+    window.addEventListener('hashchange', (e) => {
+      const newId = e.newURL.split('/')[e.newURL.split('/').length - 1]
+      console.log(newId)
+      User_Details(newId)
+      Posts_Listing(newId)
+    })
+    User_Details(id)
+    Posts_Listing(id)
     setLoading(false)
   }, [])
 
-  const Update_A_Post = (postUpdated: Post) => {
+  const Update_A_Post = (postUpdated: Post): void => {
     let allPosts = allUserPosts
     allPosts[selectedPostIndex!] = postUpdated
     setAllUserPosts(allPosts)
     forceUpdate()
   }
 
-  const Like_A_Post = async (index: number | undefined) => {
+  const Like_A_Post = async (index: number | undefined): Promise<void> => {
     const currentIndex = index! | selectedPostIndex!
     allUserPosts[currentIndex].usersWhoLiked.push(userInfos._id)
     const request = await fetch(`${API_URI}/post/update/${allUserPosts[currentIndex]._id}`, {
@@ -73,7 +77,7 @@ const Profile = (props: {userInfos: User}) => {
     }
   }
 
-  const Dislike_A_Post = async (index: number | undefined) => {
+  const Dislike_A_Post = async (index: number | undefined): Promise<void> => {
     const currentIndex = index! | selectedPostIndex!
     allUserPosts[currentIndex].usersWhoLiked.splice(allUserPosts[currentIndex].usersWhoLiked.indexOf(userInfos._id))
     const request = await fetch(`${API_URI}/post/update/${allUserPosts[currentIndex]._id}`, {
@@ -90,17 +94,17 @@ const Profile = (props: {userInfos: User}) => {
     }
   }
 
-  const Open_A_Post = (index: number) => {
+  const Open_A_Post = (index: number): void => {
     setSelectedPostIndex(index)
     setPostOpen(true)
   }
 
-  const Close_A_Post = () => {
+  const Close_A_Post = (): void => {
     setPostOpen(false)
     setSelectedPostIndex(undefined)
   }
 
-  const Like_A_Comment = async (commentIndex: number) => {
+  const Like_A_Comment = async (commentIndex: number): Promise<void> => {
     allUserPosts[selectedPostIndex!].comments[commentIndex].usersWhoLiked.push(userInfos._id)
     const request = await fetch(`${API_URI}/post/comment/update/${allUserPosts[selectedPostIndex!].comments[commentIndex]._id}`, {
       method: "PUT",
@@ -116,7 +120,7 @@ const Profile = (props: {userInfos: User}) => {
     }
   }
 
-  const Dislike_A_Comment = async (commentIndex: number) => {
+  const Dislike_A_Comment = async (commentIndex: number): Promise<void> => {
     allUserPosts[selectedPostIndex!].comments[commentIndex].usersWhoLiked.splice(allUserPosts[selectedPostIndex!].comments[commentIndex].usersWhoLiked.indexOf(userInfos._id))
     const request = await fetch(`${API_URI}/post/comment/update/${allUserPosts[selectedPostIndex!].comments[commentIndex]._id}`, {
       method: "PUT",
@@ -132,15 +136,15 @@ const Profile = (props: {userInfos: User}) => {
     }
   }
 
-  const Open_Subscribe_Modal = () => {
+  const Open_Subscribe_Modal = (): void => {
     setModalSubscribeOpen(true)
   }
 
-  const Close_Subscribe_Modal = () => {
+  const Close_Subscribe_Modal = (): void => {
     setModalSubscribeOpen(false)
   }
 
-  const Follow_User = async () => {
+  const Follow_User = async (): Promise<void> => {
     userDetails?.followers.push(userInfos._id)
     const request = await fetch(`${API_URI}/user/update/${userDetails?._id}`, {
       method: "PUT",
@@ -152,9 +156,63 @@ const Profile = (props: {userInfos: User}) => {
     const response = await request
     console.log(response)
     if (response.status == 200) {
-      const responseJson = await request.json()
+      userInfos.following.push(userDetails?._id || '')
+      const request2 = await fetch(`${API_URI}/user/update/${userInfos._id}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          following: userInfos.following
+        }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      const response2 = await request2
+      const responseJson2 = await request2.json()
+      if (response2.status == 200) {
+        localStorage.setItem('userToken', responseJson2.accessToken)
+      }
       setUserDetails(userDetails)
       forceUpdate()
+    }
+  }
+
+  const Unfollow_User = async () => {
+    if (userDetails) {
+      const id = userDetails._id
+      const index = userDetails.followers.indexOf(id)
+      userDetails?.followers.splice(index, 1)
+      const request = await fetch(`${API_URI}/user/update/${userDetails?._id}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          followers: userDetails.followers
+        }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      const response = await request
+      if (response.status == 200) {
+        const id = userInfos._id
+        const index = userInfos.following.indexOf(id)
+        userInfos?.following.splice(index, 1)
+        setUserDetails(userDetails)
+        forceUpdate()
+        const request = await fetch(`${API_URI}/user/update/${userInfos?._id}`, {
+          method: "PUT",
+          body: JSON.stringify({
+            following: userInfos.following
+          }),
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        const response = await request
+        if (response.status == 200) {
+          const responseJson = await request.json()
+          localStorage.setItem('userToken', responseJson.accessToken)
+          Close_Subscribe_Modal()
+        }
+      }
     }
   }
   
@@ -227,11 +285,11 @@ const Profile = (props: {userInfos: User}) => {
                 <label id='text'> publications</label>
               </div>
               <div>
-                <span id='count'>{userDetails?.following?.length}</span>
+                <span id='count'>{userDetails?.followers?.length}</span>
                 <label id='text'> abonnés</label>
               </div>
               <div>
-                <span id='count'>{userDetails?.followers?.length}</span>
+                <span id='count'>{userDetails?.following?.length}</span>
                 <label id='text'> abonnements</label>
               </div>
             </div>
@@ -290,6 +348,7 @@ const Profile = (props: {userInfos: User}) => {
           <ModalUnsubscribe
             isOpen={isModalSubscribeOpen}
             updatePost={Update_A_Post}
+            UnfollowUser={Unfollow_User}
             CloseModal={Close_Subscribe_Modal}
             postInfos={allUserPosts[selectedPostIndex ? selectedPostIndex : 0]} 
             userInfos={userInfos} 

@@ -24,20 +24,19 @@ const Home = (props: {userInfos: User}) => {
     const Posts_Listing = async (): Promise<void> => {
       const request = await fetch(`${API_URI}/post`)
       const responseJson = await request.json()
-      console.log(responseJson);
       setDisplayedPosts(responseJson)
     }
     Posts_Listing()
   }, [])
 
-  const Update_A_Post = (postUpdated: Post) => {
+  const Update_A_Post = (postUpdated: Post): void => {
     let allPosts: Post[] = displayedPosts
     if (typeof selectedPostIndex === 'number') allPosts[selectedPostIndex] = postUpdated
     setDisplayedPosts(allPosts)
     forceUpdate()
   }
 
-  const Like_A_Post = async (index: number | undefined) => {
+  const Like_A_Post = async (index: number | undefined): Promise<void> => {
     const currentIndex = index! | selectedPostIndex!
     displayedPosts[currentIndex].usersWhoLiked.push(userInfos?._id)
     const request = await fetch(`${API_URI}/post/update/${displayedPosts[currentIndex]._id}`, {
@@ -54,7 +53,7 @@ const Home = (props: {userInfos: User}) => {
     }
   }
 
-  const Dislike_A_Post = async (index: number | undefined) => {
+  const Dislike_A_Post = async (index: number | undefined): Promise<void> => {
     const currentIndex = index! | selectedPostIndex!
     displayedPosts[currentIndex].usersWhoLiked.splice(displayedPosts[currentIndex].usersWhoLiked.indexOf(userInfos?._id))
     const request = await fetch(`${API_URI}/post/update/${displayedPosts[currentIndex]._id}`, {
@@ -71,17 +70,17 @@ const Home = (props: {userInfos: User}) => {
     }
   }
 
-  const Open_A_Post = (index: number) => {
+  const Open_A_Post = (index: number): void => {
     setSelectedPostIndex(index)
     setPostOpen(true)
   }
 
-  const Close_A_Post = () => {
+  const Close_A_Post = (): void => {
     setPostOpen(false)
     setSelectedPostIndex(undefined)
   }
 
-  const Like_A_Comment = async (commentIndex: number) => {
+  const Like_A_Comment = async (commentIndex: number): Promise<void> => {
     displayedPosts[selectedPostIndex!].comments[commentIndex].usersWhoLiked.push(userInfos?._id)
     const request = await fetch(`${API_URI}/post/comment/update/${displayedPosts[selectedPostIndex!].comments[commentIndex]._id}`, {
       method: "PUT",
@@ -97,7 +96,7 @@ const Home = (props: {userInfos: User}) => {
     }
   }
 
-  const Dislike_A_Comment = async (commentIndex: number) => {
+  const Dislike_A_Comment = async (commentIndex: number): Promise<void> => {
     displayedPosts[selectedPostIndex!].comments[commentIndex].usersWhoLiked.splice(displayedPosts[selectedPostIndex!].comments[commentIndex].usersWhoLiked.indexOf(userInfos?._id))
     const request = await fetch(`${API_URI}/post/comment/update/${displayedPosts[selectedPostIndex!].comments[commentIndex]._id}`, {
       method: "PUT",
@@ -113,7 +112,7 @@ const Home = (props: {userInfos: User}) => {
     }
   }
 
-  const Add_A_Comment = async (postId: string) => {
+  const Add_A_Comment = async (postId: string): Promise<void> => {
     const request = await fetch(`${API_URI}/post/comment/add`, {
       method: "POST",
       body: JSON.stringify({
@@ -136,14 +135,14 @@ const Home = (props: {userInfos: User}) => {
     setModalSubscribeOpen(false)
   }
 
-  const setSideContainerLeftPosition = (e: any) => {
+  const setSideContainerLeftPosition = (e: any): void => {
     const element_positions = e.currentTarget.getBoundingClientRect()
     const margin_right = 28
     const left_position = element_positions.right + margin_right
     setSideContainerLeftPositionState(left_position)
   }
 
-  const Go_To_Profile = (userId: string) => {
+  const Go_To_Profile = (userId: string): void => {
     window.location.hash = `profile/${userId}`
   }
 

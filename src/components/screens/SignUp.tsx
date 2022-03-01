@@ -38,7 +38,7 @@ const SignUp = () => {
   }
 
   const Redirect_To_Login_Page = () => {
-    window.location.pathname = 'signin'
+    window.location.hash = 'signin'
   }
 
   return (

@@ -270,9 +270,12 @@ nav {
   width: 26px;
   height: 26px;
 }
+.nav-profile-icon svg, .nav-profile-icon img {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+}
 .nav-profile-icon svg {
-  width: 22px;
-  height: 22px;
   position: relative;
   top: 4px;
   fill: #fff;
@@ -331,7 +334,6 @@ nav {
 }
 .live-container {
   max-width: 614px;
-  height: 400px;
   width: 100%;
 }
 .stories-container {
@@ -1337,4 +1339,13 @@ textarea::placeholder {
 }
 .btn-text-bold {
   font-weight: 600;
+}
+
+@media screen and (min-width: 992px) {
+  .post-box-img {
+    max-height: 100%;
+    max-width: 1024.8px;
+    aspect-ratio: 1080 / 1349;
+    flex-basis: 1024.8px;
+  }
 }
